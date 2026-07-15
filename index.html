@@ -39,12 +39,12 @@
 <div class="wrap">
   <div class="titlebar">
     <h1>Статистика реквизитов — UZCARD</h1>
-    <div class="sub">AML-мониторинг · сводка по уникальным и повторным реквизитам</div>
+    <div class="sub" id="subline">Реквизиты, полученные при оформлении заявки на платёж, без проведения оплаты.</div>
   </div>
   <div class="toolbar">
     <div class="tabs" id="tabs">
-      <div class="tab active" data-tab="KZ">Контрольные закупки UZCARD</div>
-      <div class="tab" data-tab="P2P">P2P Реестр UZCARD</div>
+      <div class="tab active" data-tab="P2P">Сбор реквизитов</div>
+      <div class="tab" data-tab="KZ">Контрольная закупка</div>
       <div class="tab" data-tab="OVERVIEW">Обзор</div>
     </div>
     <div class="spacer"></div>
@@ -56,9 +56,10 @@
 
 <script>
 const CATS=['KZ','P2P'];
-const CAT_LABEL={KZ:'Контрольные закупки UZCARD',P2P:'P2P Реестр UZCARD'};
-const CAT_SHORT={KZ:'Контрольные закупки',P2P:'P2P Реестр'};
-let DATA=null,currentTab='KZ',chart=null;
+const CAT_LABEL={KZ:'Контрольная закупка',P2P:'Сбор реквизитов'};
+const CAT_SHORT={KZ:'Контрольная закупка',P2P:'Сбор реквизитов'};
+const CAT_DESC={P2P:'Реквизиты, полученные при оформлении заявки на платёж, без проведения оплаты.',KZ:'Реквизиты, подтверждённые фактическим платежом.',OVERVIEW:'Сводка по обоим разделам.'};
+let DATA=null,currentTab='P2P',chart=null;
 
 function fmt(n){return (n||0).toLocaleString('ru-RU');}
 function pad(n){return String(n).padStart(2,'0');}
@@ -113,7 +114,8 @@ function drawChart(cat){const t=DATA.cats&&DATA.cats[cat],el=document.getElement
     {label:'Уникальные',data:last.map(d=>t.perDate[d].unique),backgroundColor:'#2fb866',borderRadius:4,maxBarThickness:22},
     {label:'Повторные',data:last.map(d=>t.perDate[d].repeated),backgroundColor:'#3b62f0',borderRadius:4,maxBarThickness:22}]},
     options:{responsive:true,maintainAspectRatio:false,animation:false,resizeDelay:120,plugins:{legend:{position:'bottom',labels:{boxWidth:12}}},scales:{x:{grid:{display:false},ticks:{autoSkip:true,maxRotation:60}},y:{beginAtZero:true,grid:{color:'#eef0f7'}}}}});}
-function render(){const v=document.getElementById('view');
+function render(){const sl=document.getElementById('subline');if(sl)sl.textContent=CAT_DESC[currentTab]||'';
+  const v=document.getElementById('view');
   if(!DATA){v.innerHTML='<div class="panel"><div class="empty"><b>Данные ещё не опубликованы.</b><br>Загрузите на хостинг файл <code>stats.json</code> рядом с этой страницей.</div></div>';return;}
   if(currentTab==='OVERVIEW'){v.innerHTML=renderOverview();return;}
   v.innerHTML=renderCat(currentTab);drawChart(currentTab);}
